@@ -1,5 +1,3 @@
-R = React.DOM
-
 @Records = React.createClass
   getInitialState: ->
     records: @props.data
@@ -12,6 +10,10 @@ R = React.DOM
   deleteRecord: (record) ->
     records = @state.records.slice()
     records.splice records.indexOf(record), 1
+    @replaceState records: records
+  updateRecord: (record, data) ->
+    index = @state.records.indexOf record
+    records = React.addons.update(@state.records, { $splice: [[index, 1, data]] })
     @replaceState records: records
   credits: ->
     credits = @state.records.filter (val) -> val.amount >= 0
@@ -46,7 +48,12 @@ R = React.DOM
         </thead>
         <tbody>
           { this.state.records.map((record) => {
-              return(<Record key={ record.id } record={ record } handleDeleteRecord={ this.deleteRecord } />)
+              return(
+                <Record
+                  key={ record.id }
+                  record={ record }
+                  handleDeleteRecord={ this.deleteRecord }
+                  handleUpdateRecord={ this.updateRecord } />)
             })
           }
         </tbody>
