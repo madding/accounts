@@ -17,8 +17,8 @@ class RecordsController < ApplicationController
   end
 
   def destroy
-    @record.destroy
-
+    #@record.destroy
+    ActionCable.server.broadcast('updates:records', method: 'destroy', body: @record)
     head :no_content
   end
 

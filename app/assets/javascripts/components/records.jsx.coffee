@@ -3,6 +3,16 @@
     records: @props.data
   getDefaultProps: ->
     records: []
+  componentDidMount: ->
+    App.cable.subscriptions.create { channel: 'UpdatesChannel', room: 'records' },
+      connected: ->
+        console.log 'connected'
+      disconnected: ->
+        console.log 'disconnected'
+      received: @haveUpdates
+  haveUpdates: (data) ->
+    console.log 'received'
+    console.log data
   addRecord: (record) ->
     records = @state.records.slice()
     records.push record
