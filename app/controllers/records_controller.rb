@@ -10,6 +10,11 @@ class RecordsController < ApplicationController
     @record = Record.new(record_params)
 
     if @record.save
+      ActionCable.server.broadcast(
+        'updates:records',
+        method: 'create',
+        body: @record
+      )
       render json: @record
     else
       render json: @record.errors, status: :unprocessable_entity
@@ -18,12 +23,24 @@ class RecordsController < ApplicationController
 
   def destroy
     #@record.destroy
-    ActionCable.server.broadcast('updates:records', method: 'destroy', body: @record)
+
+    ActionCable.server.broadcast(
+      'updates:records',
+      method: 'delete',
+      body: @record,
+      uuid: params[:uuid]
+    )
     head :no_content
   end
 
   def update
     if @record.update(record_params)
+      ActionCable.server.broadcast(
+        'updates:records',
+        method: 'update',
+        body: @record,
+        uuid: params[:uuid]
+      )
       render json: @record
     else
       render json: @record.errors, status: :unprocessable_entity

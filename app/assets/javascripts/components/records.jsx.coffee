@@ -1,6 +1,7 @@
 @Records = React.createClass
   getInitialState: ->
     records: @props.data
+    uuid: @props.uuid
   getDefaultProps: ->
     records: []
   componentDidMount: ->
@@ -10,9 +11,21 @@
       disconnected: ->
         console.log 'disconnected'
       received: @haveUpdates
-  haveUpdates: (data) ->
-    console.log 'received'
-    console.log data
+  haveUpdates: (params) ->
+    record = @state.records.filter((rec) -> rec.id == params.body.id)[0]
+
+    switch params.method
+      when "delete"
+        if record && params.uuid != @state.uuid
+          @deleteRecord record
+      when "update"
+        if record && params.uuid != @state.uuid
+          @updateRecordLocal record, params.body
+      when "create" && params.uuid != @state.uuid
+        # TODO: check this
+        if !record
+          @addRecord params.body
+      else console.log(data)
   addRecord: (record) ->
     records = @state.records.slice()
     records.push record
@@ -21,10 +34,15 @@
     records = @state.records.slice()
     records.splice records.indexOf(record), 1
     @replaceState records: records
-  updateRecord: (record, data) ->
+  updateRecordLocal: (record, data) ->
     index = @state.records.indexOf record
     records = React.addons.update(@state.records, { $splice: [[index, 1, data]] })
-    @replaceState records: records
+    @replaceState records: records, uuid: @state.uuid
+  updateRecord: (record, data) ->
+    $.post "records/#{ record.id }",
+      { _method: 'put', record: data, uuid: @state.uuid },
+      (data) => @updateRecordLocal(record, data),
+      'JSON'
   credits: ->
     credits = @state.records.filter (val) -> val.amount >= 0
     credits.reduce ((prev, curr) ->

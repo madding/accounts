@@ -7,14 +7,14 @@
   handleEdit: (e) ->
     e.preventDefault()
     data =
-     title: ReactDOM.findDOMNode(@refs.title).value
-     date: ReactDOM.findDOMNode(@refs.date).value
-     amount: ReactDOM.findDOMNode(@refs.amount).value
+      title: ReactDOM.findDOMNode(@refs.title).value
+      date: ReactDOM.findDOMNode(@refs.date).value
+      amount: ReactDOM.findDOMNode(@refs.amount).value
 
-    $.post "records/#{ @props.record.id }", { _method: 'put', record: data }, (data) =>
-      @setState edit: false
-      @props.handleUpdateRecord @props.record, data
-    , 'JSON'
+    console.log @parent
+
+    @setState edit: false
+    @props.handleUpdateRecord @props.record, data
   handleDelete: (e) ->
     e.preventDefault()
 
