@@ -11,10 +11,12 @@
       date: ReactDOM.findDOMNode(@refs.date).value
       amount: ReactDOM.findDOMNode(@refs.amount).value
 
-    console.log @parent
-
-    @setState edit: false
-    @props.handleUpdateRecord @props.record, data
+    $.post "records/#{ @props.record.id }",
+      { _method: 'put', record: data },
+      (data) =>
+        @setState edit: false
+        @props.handleUpdateRecord @props.record, data
+    'JSON'
   handleDelete: (e) ->
     e.preventDefault()
 

@@ -13,7 +13,7 @@ class RecordsController < ApplicationController
       ActionCable.server.broadcast(
         'updates:records',
         method: 'create',
-        body: @record
+        records: Record.all
       )
       render json: @record
     else
@@ -22,13 +22,12 @@ class RecordsController < ApplicationController
   end
 
   def destroy
-    #@record.destroy
+    @record.destroy
 
     ActionCable.server.broadcast(
       'updates:records',
       method: 'delete',
-      body: @record,
-      uuid: params[:uuid]
+      records: Record.all
     )
     head :no_content
   end
@@ -38,8 +37,7 @@ class RecordsController < ApplicationController
       ActionCable.server.broadcast(
         'updates:records',
         method: 'update',
-        body: @record,
-        uuid: params[:uuid]
+        records: Record.all
       )
       render json: @record
     else
